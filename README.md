@@ -1,6 +1,7 @@
-Programming With Anthony Scripts
+Programmer avec Anthony - Version Francvaise. 
+Programming With Anthony Scripts (French Traduction )
 ================================
+Ceci est une version traduite en francais des superbes presentations d'Anthony Ferrara. Les traductions sont faites sur les textes uniquement.
 
-These are the scripts for the [Programming With Anthony](https://www.youtube.com/playlist?list=PLM-218uGSX3DQ3KsB5NJnuOqPqc5CW2kW&feature=view_all) video series on youtube.
-
-They are provided for reference.
+[Programming With Anthony](https://www.youtube.com/playlist?list=PLM-218uGSX3DQ3KsB5NJnuOqPqc5CW2kW&feature=view_all) video series on youtube.
+Il sont soumis pour reference.
