@@ -1,124 +1,57 @@
-References in PHP
+References en PHP
 =================
 
-To explore how references work in PHP
-We need to first take a step back
-And take a look at how variables work in PHP.
+Pour explorer comment les références fonctionnent en PHP, dous devons d'abord prendre un peu de recul et jeter un oeil à la façon dont les variables fonctionnent en PHP.
+Typiquement, on nous apprend à visualiser une variable un récipient pour une valeur nommée. Mais nous nous trouvons souvent dans une situation où nous avons besoin de copier une variable.
 
-Typically, we're taught to visualize a variable
-as a named container for a value.
+Les copies peuvent être aussi simples comme affecter une variable à l'autre. Mais les copies peuvent également se produire dans d'autres situations, tels que lors du passage d'une variable à une fonction,lors du retour d'une variable à partir d'une fonction
+Ou lors de l'itération sur un tableau.
 
-But we often find ourselves in a situation
-where we need to copy a variable.
+Alors, quand on copie une variable, on copie la valeur contenue aussi bien. Et cela fait sens. Si nous avons deux variables différentes avec des noms différents, nous nous attendons a avoir des conteneurs  différents.
 
-Copies can be as straight forward as directly assigning one variable to another.
-But copies can also occur in other situations,
-Such as when passing a variable to a function,
-When returning a variable from a function
-Or when iterating over an array.
+Donc, si nous éditons un conteneur, nous nous attendons que l'autre reste le même. Mais cela a des problèmes aussi, chaque fois que nous copions une variable, nous avons besoin de dupliquer la valeur contenue.
 
-So when we copy a variable,
-we're copying the contained value as well.
+Cela peut conduire à une duplication grave de zones mémoire, ce qui peut entraîner des problèmes de performances.
+PHP résout ce problème en séparant la variable du conteneur valeur. Les variables deviennent alors  des pointeurs vers une valeur. Quand on copie une variable, nous copions tout simplement ce pointeur.
+Cela introduit un nouveau problème: lorsque nous supprimons une variable, Comment pouvons-nous savoir si nous pouvons supprimer la valeur?
 
-And that makes sense. 
-If we have two different variables with different names,
-we'd expect the containers to be different.
+La façon dont PHP résout ce problème est de maintenir un comptage du nombre de références à une valeur. Ainsi, le conteneur valeur, dispose désormais de deux champs:  La valeur elle-même,et un compteur de référence, aussi connu comme un "refcount". Chaque fois que nous copier une variable, nous augmentons le refcount, et chaque fois que nous supprimons une variable, nous diminuons le refcount. Si le refcount arrive a 0, on peut sans risque supprimer la valeur. 
+Mais nous avons aussi un autre problème. Si nous modifions la copie d'une variable, nous faisons aussi éditer l'original puisqu'ils utilisent le conteneur même valeur.
 
-So if we edit one container, 
-we expect the other to remain the same.
+Heureusement, nous avons déjà une façon de régler ce problème. Le "refcount"  peut nous indiquer quand nous pouvons modifier ou quand nous avons besoin de copier la valeur.
 
-But this has some problems as well.
-Every time we copy a variable,
-we need to duplicate the contained value as well.
+Ainsi, lorsque nous éditons une valeur, si le refcount est 1, nous pouvons modifier directement la valeur.
 
-This can lead to severe memory duplication,
-which can result in major performance issues.
+Si le refcount est supérieur à 1, nous avons besoin de copier la première valeur, et puis, nous pouvons modifier la copie.
 
-The PHP solves this problem
-Is by separating the variable from the value container.
+Ceci est également connu sous le nom "copy on write". 
 
-Variables then become nothing but pointers to a value.
+Jusqu'ici tout va bien.
 
-When we copy a variable, we are just copying that pointer.
+Maintenant, qu'est-ce qui se passe lorsque nous voulons deux variables pour pouvoir les éditer ensemble en même temps?
+En PHP, nous allons utiliser l'opérateur de référence eperluette.
 
-This introduces a new problem:
-When we delete a variable,
-How do we know if we can delete the value?
+Mais qu'est ce qui est fait que sous le capot?
+Eh bien, pour mettre en œuvre cette fonctionnalité, tout ce que nous devons faire est de désactiver la copie-sur-écriture.
+Mais nous ne voulons le désactiver que pour les valeurs référencées.
 
-The way PHP solves this,
-Is by keeping a count of the number of references to a value.
+La façon pour atteindre ce but est d'ajouter un champ supplémentaire dans le récipient valeur. Il s'agit d'une valeur booléenne simple, que nous appellerons "is_ref".
 
-So the value container, now has two fields
-The value itself,
-And a reference counter, also known as a "refcount"
+Si is_ref est vrai alors que nous éditons un varible, nous ne copions pas la première valeur.
 
-Every time we copy a variable, we increase this refcount
-And every time we delete a variable, we decrease this refcount.
+Mais maintenant qu'est ce qui se passe si nous essayons de faire une copie normale d'une valeur de référence?
+Nous ne pouvons pas augmenter le refcount, car alors nous ferions une référence à la place.
 
-If the refcount ever hits 0, we can safely delete the value.
+Nous avons donc besoin de faire une copie complète de la valeur. Par conséquent, à chaque fois que nous utilisons des références,
+Nous perdons tous les avantages que copy-on-write nous donne.
+En PHP4, c'est ainsi que toutes les variables sont gerees. 
 
-But we also have another problem.
-If we edit the copy of a variable,
-We're also editing the original one.
+A partir de PHP5, les objets sont traités d'une manière légèrement différente. Au lieu de stocker l'objet sur la meme valeur,
+il ya une deuxième couche d'abstraction. Les objets sont stockés dans leur propre conteneur et pointés par la valeur.
+Qu'est-ce que cela signifie pour nous, c'est que même si on copie une variable objet, tous les contrôles vont encore à la même place.
+Donc, nous n'avons pas besoin d'utiliser des références variables du tout lorsqu'il s'agit d'objets.
+Si nous voulons faire une copie d'une valeur de l'objet, nous avons besoin d'utiliser le "clone" de l'opérateur.
 
-This is because they are using the same value container.
-
-Luckily, we already have a way of fixing this.
-We can use the "refcount" to tell us when we can edit,
-Or when we need to copy the value.
-
-So when we are editing a value, if the refcount is 1,
-We can directly edit the value.
-
-If the refcount is greater than 1,
-We need to copy the value first,
-And then we can edit the copy.
-
-This is also known as "copy on write".
-
-So far so good.
-
-Now, what happens when we want two variables to be edited together at the same time?
-In PHP, we would use the ampersand reference operator.
-But what is that doing under the hood?
-
-Well, to implement this feature, all we need to do is disable copy-on-write.
-But we only want to disable this for referenced values.
-
-The way we can identifiy this, is to add one more field to the value container.
-This is a simple boolean value, which we'll call "is_ref".
-
-If is_ref is true while we're editing a varible, we don't copy the value first.
-
-But now what happens if we try to do a normal copy of a referenced value?
-We can't just increase the refcount, because then we'd be doing a reference instead.
-
-So we need to do a full copy of the value.
-Therefore, anytime that we use references, 
-We lose all of the benefits that copy-on-write gives us.
-
-In PHP4, this was how all variables worked.
-
-Starting with PHP5, objects are treated in a slightly different way.
-
-Instead of storing the object on the value itslef,
-there's a second layer of abstraction.
-
-Objects are stored in their own container,
-And pointed to by the value.
-
-What that means for us, is that even if we copy an object variable,
-all edits still go to the same place.
-
-So we don't need to use variable references at all when dealing with objects.
-
-If we want to make a copy of an object value, 
-We need to use the "clone" operator.
-
-When writing modern PHP code,
-Don't try to outsmart the system.
-
-Using references to try to save memory usually will wind up costing you more memory.
-Let PHP handle variables for you.
-It's smarter than you think.
-
+Lors de l'écriture moderne du code PHP, il ne faut donc pas essayer de déjouer le système.
+L'utilisation de références pour tenter de sauver la mémoire finira en général par vous coûter plus de mémoire.
+Laissez PHP manipuler des variables pour vous, Il est plus intelligent que vous le pensez.
