@@ -1,5 +1,4 @@
 Programmer avec Anthony - Version Francvaise. 
-Programming With Anthony Scripts (French Traduction )
 ================================
 Ceci est une version traduite en francais des superbes presentations d'Anthony Ferrara. Les traductions sont faites sur les textes uniquement.
 
