@@ -1,5 +1,3 @@
-Closures
-========
 Les Closures
 ============
 
