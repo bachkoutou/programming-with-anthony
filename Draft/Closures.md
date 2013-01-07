@@ -39,11 +39,3 @@ Et du coup, toutes les fonctions qui ont ete definies dans les scopes des autres
 Et en considerant que le scope racine est le scope global, toutes les fonctions sont imbriquees dans le scope global.
 
 Et donc, toutes les fonctions dans Javascript sont automatiquement des closures!
-
-
-And considering that the root scope is the global scope,
-All functions are nested inside the global scope.
-
-Therefore, all functions in JavaScript are automatically closures!
-
-
