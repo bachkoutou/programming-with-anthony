@@ -1,57 +1,47 @@
 Closures
 ========
+Les Closures
+============
 
-The first interesting thing about closures in JavaScript
-Is that they are no different from normal functions.
+La première chose intéressante à propos des closures en JavaScript est qu'ils ne sont pas différents des fonctions normales.
+Toutes les fonctions JavaScript sont des fermetures.
 
-That's right, all functions in JavaScript are closures.
+Mais qu'est ce que les closures ?
+Simplement, une closure vient du mot anglais "close", qui veut dire "fermer". Donc une closure ferme le contexte d'une fonction.
 
-But what are closures?
+Cela signifie que le scope de la closure contient automatiquement toutes les informations de ses parents.
 
-To put it simply, a closure "closes" around the scope of its parents.
+Pour comprendre ce que cela signifie, nous devons d'abord parler de le scope des variables.
 
-That means that the closure's scope automatically contains 
-everything from its parents.
+Regardons un autre language : PHP.
 
-To understand what that means,
-We first need to talk about variable scope.
+PHP dispose de deux principaux scopes pour les variables : le scope Global et le scope de fonction.
 
-Let's look at a different language first: PHP.
+le scope par défaut est toujours le scope de fonction (si on ignore les super globales).
 
-PHP has two main variable "scopes":
-Global scope and Function scope.
+Donc, si nous attribuons une variable de l'intérieur d'une fonction, cette variable sera définie uniquement dans le scope de la fonction.
 
-The default scope is the one that you are currently operating in,
-ignoring the concept of "super globals".
+Si l'on voulait que la variable soit plutôt dans le scope global, nous aurions besoin de déclarer notre intention avec le construit "global".
 
-So if we assign a variable inside of a function, 
-The variable is set to the function's scope.
+Donc, en PHP, quand nous déclarons une closure, nous avons besoin d'indiquer explicitement les variables à importer à partir de le scope parente.
 
-If we wanted that variable to be in the global scope,
-We would need to declare that as our intention.
+Ce qui est important a noter ici est que les variables sont imscopes. Les variables sont en fait copiées dans le scope de la closure.
 
-So in PHP, when we declare a closure
-we need to explicitly tell it which variables to import from the parent scope.
+Par ailleurs, dans PHP, chaque scope est complètement indépendant de n'importe quel autre scope. Le seul moyen de lier deux scopes et d'utiliser les references.
 
-The important thing to note here is that the variables are *imported*.
-The variables are actually copied into the closure's scope.
+Javascript, Par contre, gere les scopes imbriquées. 
+Les scopes s'imbriquent la ou elles sont definies.
 
-Therefore, in PHP, each "scope" is completely independent from every other scope.
-And the only way to tie two scopes together is using variable references.
 
-JavaScript on the other hand uses nested scopes.
+Donc, si on definit une closure a l'interieur d'une fonction, le scope de la closure va etre imbriquee dans le scope de la fonction.
 
-The scopes nest based on where they are defined.
+Ceci signifie que l'acces a  la variable traverse la chaine des scopes parentes jusqu'a ce qu'il trouve le scope la ou la variable a ete definie.
 
-So if we define a closure within another function,
-The closure's scope will be nested inside the function's scope.
+Et du coup, toutes les fonctions qui ont ete definies dans les scopes des autres fonctions sont toujours des closures, meme si ils ont les noms de functions.
+Et en considerant que le scope racine est le scope global, toutes les fonctions sont imbriquees dans le scope global.
 
-That means that variable access traverses up the chain of scopes
-until it finds the scope the variable was defined in.
+Et donc, toutes les fonctions dans Javascript sont automatiquement des closures!
 
-Therefore, all functions which are defined inside of another function's scope
-are always closures. 
-Even if they are named functions!
 
 And considering that the root scope is the global scope,
 All functions are nested inside the global scope.
