@@ -1,75 +1,41 @@
 Dependency Injection
 ====================
 
-What is Dependency Injection?
-Well, the literal meaning is to inject dependencies.
+Qu'est ce que l'injection de dependances?
+Litéralement, cela veut dire : injecter des des dependances.
+Commençons par definir ce qu'est une dependance. Une dependance est en effet un objet que votre classe necessite pour fonctionner.
+Si nous avons une classe modele qui recupere des données depuis un objet Database, nous pouvons dire que ce la classe modele a une dependance a l'objet Database.
+Maintenant que nous savons ce qu'est une dependance, voyons ce que veut dire d'injecter des dependances.
+Injecter des dependances veut juste dire que la dependance est poussée dans la classe depuis l'exterieur.
 
-So let's start by defining what a Dependency is.
-A Dependency is just another object that your class needs to function
 
-So if you have a model class that fetches data from a database object,
-We can say that your model class has a dependency of the database object.
+Tout ce que cela veut dire est que vous ne devez pas instancier vos dependances (avec le construit new) a l'interieur de vos classes, mais plutôt les récupérer comme un paramètre de constructeur ou un setter.
 
-So now that we know what the dependency is, let's talk about what it means to inject dependencies.
 
-Injecting dependencies just means that the dependency is pushed into the class from outside.
+C'est tout ce que c'est par rapport a l'injection de dependances. Vous n'avez pas besoin d'un "container" super cool ou d'une classe pour faire de l'injection de dependances. C'est sur que votre vie sera meilleure si vous les utilisez, mais ils ne sont pas "necessaires".
 
-All that means is that you shouldn't instantiate dependencies with `new` inside of the class,
-But instead take it as a constructor parameter or via a setter.
-
-That's all there is to Dependency Injection. 
-
-You don't need a fancy container or class to do it.
-Sure, they may make your life easier, but you don't *need* them...
-
-But Why should you inject dependencies in the first place?
+Mais pourquoi devons nous injecter des dependances ? 
 
 Let's imagine for a minute that you're programming a house building robot.
-You start with a pile of lumber, and program it to start building walls.
+Imaginons que nous avons comme tache de programmer un robot de construction de maisons. Nous commençons par une pile de briques, et nous devons construire des murs. Nous arrivons par la suite a mettre la porte de notre maison. Que faisons nous dans ce cas? Est ce que nous construisons une porte a partir de matières premieres? ou que nous programmons notre robot pour récupérer une porte deja prete (qu'un autre fournisseur a construite) et nous ne faisons que l'installer?
 
-Then, when you get to a doorway, what do you do?
+La solution la plus flexible, évidemment, serait de récupérer la porte depuis un fournisseur externe.
+Et c'est exactement ce que l'injection de dependances fait. Elle decouple la construction de vos classes de la construction de ses dependances.
 
-Do you program it to build a custom door out of raw materials? 
-Or do program it to take a ready made door from a supplier and install it?
+La raison derriere cette importance est le principe d'Inversion de dependances.
+Le principe d'inversion de dependances est le fait que le code doit dépendre d'abstractions. En dépendant d'abstractions, nous découplons nos implementations. 
+Ce que cela veut dire, c'est qu'en PHP, votre code doit dépendre d'interfaces. Vous pourrez alors substituer les differentes dependances, du moment qu'ils satisfont l'interface requise.
+En utilisant l'injection de dependances, nous découplons le code de l'implementation bas-niveau, ce qui rend le code beaucoup plus elegant, plus facile a modifier et a réutiliser.
 
-The most flexible way to do it would be to take the door from a supplier.
+Maintenant que nous avons adopté l'injection de dependances, nous avons un autre problème. Chacune de nos classes necessite des dependances. Donc, pour construire chaque classe, nous devons trouver quels sont les dependances dont elles ont besoin et trouver un moyen pour récupérer ces derniers dans la ligne qui les instancie.
 
-And that's exactly what dependency injection does.
-It decouples your classes construction from the construction of its dependencies.
+Heureusement qu'il ya une solution pour résoudre ce problème : Le conteneur d'injection de dependances, ou plus communèment connu sous "Dependency Injection Container".
 
-The reason that is so important is the Dependency Inversion Principle.
+Au root de votre application, le container n'est rien d'autre qu'une "carte" des dependances que votre classe necessite, avec la logique necessaire pour les creer si elles ne sont pas encore créées.
+A chaque fois que vous demandez une interface "DatabaseInterface", la carte des dependances indiquera quelle dependance utiliser, le container vérifie par la suite si l'objet a été instancié auparavant, et le réutilisé si c'est le cas. Sinon, il va creer l'instance Database, la sauvegarde et la fournit a votre classe.
+Donc, au lieu de creer la classe par vous meme, vous demander au container de creer l'instance. Il va résoudre les dependances, construire l'objet et le retourner pour vous.
 
-Basically, Dependency Inversion is the principle that code should depend on abstractions.
-By depending on abstractions, we're decoupling our implementations from each other.
+La meilleure partie est que le container peut résoudre des dependances complexes et c'est transparent! Si vous voulez changer la dependance pour une autre, ou par exemple la mocker dans un test unitaire, tout ce que vous avez a faire est de mettre a jour la dependance dans le container, c'est a une seule place.
 
-In PHP, that means that your code should depend on interfaces.
-That way, we can substitute different dependencies, as long as they all satisfy that required interface.
+Ecrivez donc un code plus propre et plus modulaire, utilisez l'injection de dependance.
 
-By using Dependency Injection, we decouple our code from the lower-level implementations,
-making our code cleaner, easier to modify and easier to reuse.
-
-Now that we've adopted Dependency Injection, now we have another problem.
-Each one of our classes require dependencies.
-
-So now, to construct each and every class, we need to figure out what dependencies they need,
-And figure out a way to get them to the line instantiating them.
-
-Luckily for us there is a solution.
-Enter the Dependency Injection Container.
-
-At the root, the container is nothing more than a map of the dependencies that your classes need,
-With the logic needed to create them if they haven't been created yet.
-
-So every time you ask for a `DatabaseInterface`, the map tells it which dependency to use,
-Then the container can check to see if it has one created already, and if it has, use that one.
-Otherwise, it'll create the database instance, store it, and then provide it to your class.
-
-So instead of constructing your class yourself, you ask the container for a new instance.
-It will then resolve the dependencies, construct the object and return it to you.
-
-The best part of it is that the container can resolve complex dependencies transparently.
-And if you want to swap out a generic dependency, say if you're switching from APC to Memcached, 
-You only need to update that dependency in the container once.
-
-So write cleaner and more modular code.
-Use Dependency Injection...

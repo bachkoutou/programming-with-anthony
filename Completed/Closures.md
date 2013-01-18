@@ -1,5 +1,6 @@
 Les Closures
 ============
+
 La première chose intéressante à propos des closures en JavaScript est qu'ils ne sont pas différents des fonctions normales.
 Toutes les fonctions JavaScript sont des fermetures.
 
